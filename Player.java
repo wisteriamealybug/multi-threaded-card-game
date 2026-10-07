@@ -1,3 +1,6 @@
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class Player extends Thread {
     private Card[] hand;
     private int number;
@@ -8,6 +11,15 @@ public class Player extends Thread {
         wanted = 0;
         this.number = number;
         setName("player" + number);
+    }
+
+    public void run(){
+        try {
+            FileWriter file = new FileWriter(getName()+"_output.txt");
+            file.write("player " + number + " initial hand " + hand[0].getValue() + 
+            hand[1].getValue() + hand[2].getValue() + hand[3].getValue());
+            file.close();
+        } catch (IOException e){System.out.println("fail");}
     }
 
     public void addCard(Card card){
