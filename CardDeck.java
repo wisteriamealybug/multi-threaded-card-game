@@ -1,7 +1,7 @@
 public class CardDeck {
-    Card[] deck;
-    int top;
-    int tail;
+    private Card[] deck;
+    private int top;
+    private int tail;
 
     public CardDeck(int n){
         deck = new Card[2*n];
