@@ -1,5 +1,7 @@
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Player extends Thread {
     private Card[] hand;
@@ -7,17 +9,43 @@ public class Player extends Thread {
     private int wanted;
     private CardDeck drawDeck;
     private CardDeck discardDeck;
+    private volatile AtomicBoolean hasPlayerWon;
+    private volatile AtomicInteger winningPlayer;
 
-    public Player(int number) {
+    public Player(int number, AtomicBoolean flag, AtomicInteger winningPlayer) {
         hand = new Card[4];
         wanted = 0;
         this.number = number;
         setName("player" + number);
+        this.hasPlayerWon = flag;
+        this.winningPlayer = winningPlayer;
     }
 
     public void run() {
         String initalText = "player " + number + " initial hand " + getHand();
+        String finalText = "";
         writeToFile(initalText);
+
+        if (hasWon()) {
+            winningPlayer.set(number);
+            hasPlayerWon.set(true);
+            finalText += "player " + number + " wins\n";
+        }
+
+        while (!hasPlayerWon.get()) {
+            atomicDrawDiscard();
+            if (hasWon()) {
+                winningPlayer.set(number);
+                hasPlayerWon.set(true);
+                finalText += "player " + number + " wins\n";
+            }
+        }
+        if (!hasWon()) {
+            int winningNumber = winningPlayer.get();
+            finalText += "player " + winningNumber + " has informed player " + number + " that player" + winningNumber + " has won\n";
+        }
+        finalText += "player " + number + " exits\n" + "player " + number + " final hand " + getHand();
+        writeToFile(finalText);
     }
 
     public void addCard(Card card) {
