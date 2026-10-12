@@ -7,8 +7,11 @@ public class CardDeck {
     private int top;
     private int tail;
 
-    public CardDeck(int n, int number) {
-        deck = new Card[2 * n];
+    public CardDeck(int number) {
+        // The size is set to 13 to allow for the case where one player
+        // discards all from its hand and the previous deck to the following deck
+        // 13 allows for 12 cards to be in the deck at one time
+        deck = new Card[13];
         this.number = number;
         top = 0;
         tail = 0;
