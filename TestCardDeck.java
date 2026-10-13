@@ -28,7 +28,7 @@ public class TestCardDeck {
     public void TestNumberAssignment() {
         CardDeck[] decks = createDecks(10);
         for (int i = 0; i < 10; i++) {
-            assertEquals("Deck numbers incorrectly assigned. Should be " + i + 1 + " was " + decks[i].getNumber(),
+            assertEquals("Deck numbers incorrectly assigned",
                     i + 1,
                     decks[i].getNumber());
         }
