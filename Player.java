@@ -12,13 +12,15 @@ public class Player extends Thread {
     private volatile AtomicBoolean hasPlayerWon;
     private volatile AtomicInteger winningPlayer;
 
-    public Player(int number, AtomicBoolean flag, AtomicInteger winningPlayer) {
+    public Player(int number, CardDeck drawDeck, CardDeck discardDeck, AtomicBoolean flag, AtomicInteger winningPlayer) {
         hand = new Card[4];
         wanted = 0;
         this.number = number;
         setName("player" + number);
         this.hasPlayerWon = flag;
         this.winningPlayer = winningPlayer;
+        this.drawDeck = drawDeck;
+        this.discardDeck = discardDeck;
     }
 
     public void run() {
@@ -51,7 +53,7 @@ public class Player extends Thread {
     public void addCard(Card card) {
         for (int i = 0; i < 4; i++) {
             if (hand[i] == null) {
-                if (hand[i].getValue() == number) {
+                if (card.getValue() == number) {
                     wanted++;
                 }
                 hand[i] = card;
@@ -60,7 +62,7 @@ public class Player extends Thread {
         }
     }
 
-    public void atomicDrawDiscard() {
+    public synchronized void atomicDrawDiscard() {
         Card drawn = drawDeck.drawCard();
         Card toDiscard = discard();
         addCard(drawn);

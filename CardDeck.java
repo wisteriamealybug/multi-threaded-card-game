@@ -21,19 +21,25 @@ public class CardDeck {
         return number;
     }
 
-    public void addCard(Card card) {
+    public synchronized void addCard(Card card) {
         deck[tail++] = card;
         tail = tail % deck.length;
+        notify();
     }
 
-    public Card drawCard() throws IllegalStateException {
+    public synchronized Card drawCard() throws IllegalStateException {
         if (top == tail) {
-            throw new IllegalStateException("Cannot draw card from empty deck");
-        } else {
-            Card c = deck[top++];
-            top = top % deck.length;
-            return c;
+            try{
+                wait();
+            } catch (InterruptedException e){}
         }
+        Card c = deck[top++];
+        top = top % deck.length;
+        return c;
+    }
+
+    public Boolean isEmpty(){
+        return top == tail;
     }
 
     public void printDeckToFile() {
