@@ -7,11 +7,11 @@ public class CardDeck {
     private int top;
     private int tail;
 
-    public CardDeck(int number) {
+    public CardDeck(int number, int playerNumber) {
         // The size is set to 13 to allow for the case where one player
         // discards all from its hand and the previous deck to the following deck
         // 13 allows for 12 cards to be in the deck at one time
-        deck = new Card[13];
+        deck = new Card[4 * playerNumber + 1];
         this.number = number;
         top = 0;
         tail = 0;
@@ -23,23 +23,34 @@ public class CardDeck {
 
     public synchronized void addCard(Card card) {
         deck[tail++] = card;
-        tail = tail % deck.length;
+        tail = tail % deck.length; // wraps around for circular queue
         notify();
     }
 
-    public synchronized Card drawCard() throws IllegalStateException {
+    public synchronized Card drawCard() throws InterruptedException {
         if (top == tail) {
-            try{
+            try {
                 wait();
-            } catch (InterruptedException e){}
+                if (top == tail) {
+                    return null;
+                }
+            } catch (InterruptedException e) {
+                throw e;
+            }
         }
         Card c = deck[top++];
+        deck[top - 1] = null; // Removes element to help with printing top = top % deck.length;
         top = top % deck.length;
+        notify();
         return c;
     }
 
-    public Boolean isEmpty(){
+    public Boolean isEmpty() {
         return top == tail;
+    }
+
+    public synchronized void notifyHasWon() {
+        notify();
     }
 
     public void printDeckToFile() {
@@ -50,7 +61,7 @@ public class CardDeck {
                     toWrite += deck[i].getValue() + " ";
                 }
             }
-            file.write(toWrite);
+            file.write(toWrite.strip());
         } catch (IOException e) {
             System.out.println("fail");
         }

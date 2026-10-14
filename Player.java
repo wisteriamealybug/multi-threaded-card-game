@@ -1,5 +1,7 @@
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -11,8 +13,10 @@ public class Player extends Thread {
     private CardDeck discardDeck;
     private volatile AtomicBoolean hasPlayerWon;
     private volatile AtomicInteger winningPlayer;
+    private CyclicBarrier latch;
 
-    public Player(int number, CardDeck drawDeck, CardDeck discardDeck, AtomicBoolean flag, AtomicInteger winningPlayer) {
+    public Player(int number, CardDeck drawDeck, CardDeck discardDeck, AtomicBoolean flag,
+            AtomicInteger winningPlayer, CyclicBarrier latch) {
         hand = new Card[4];
         wanted = 0;
         this.number = number;
@@ -21,17 +25,23 @@ public class Player extends Thread {
         this.winningPlayer = winningPlayer;
         this.drawDeck = drawDeck;
         this.discardDeck = discardDeck;
+        this.latch = latch;
     }
 
     public void run() {
-        String initalText = "player " + number + " initial hand " + getHand();
+        String initalText = "player " + number + " initial hand " + getHand() + "\n";
         String finalText = "";
-        writeToFile(initalText);
+        writeToFile(initalText, false);
 
         if (hasWon()) {
             winningPlayer.set(number);
             hasPlayerWon.set(true);
             finalText += "player " + number + " wins\n";
+        }
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+        } catch (BrokenBarrierException e) {
         }
 
         while (!hasPlayerWon.get()) {
@@ -40,14 +50,18 @@ public class Player extends Thread {
                 winningPlayer.set(number);
                 hasPlayerWon.set(true);
                 finalText += "player " + number + " wins\n";
+                discardDeck.notifyHasWon();
             }
         }
         if (!hasWon()) {
             int winningNumber = winningPlayer.get();
-            finalText += "player " + winningNumber + " has informed player " + number + " that player" + winningNumber + " has won\n";
+            finalText += "player " + winningNumber + " has informed player " + number + " that player " + winningNumber
+                    + " has won\n";
+            discardDeck.notifyHasWon();
         }
         finalText += "player " + number + " exits\n" + "player " + number + " final hand " + getHand();
-        writeToFile(finalText);
+        writeToFile(finalText, true);
+        drawDeck.printDeckToFile();
     }
 
     public void addCard(Card card) {
@@ -63,19 +77,32 @@ public class Player extends Thread {
     }
 
     public synchronized void atomicDrawDiscard() {
-        Card drawn = drawDeck.drawCard();
+        Card drawn = null;
+        // Player is interrupted if another player wins while it waits for an empty deck
+        // It then returns, failing the atomic action entirely.
+        try {
+            drawn = drawDeck.drawCard();
+        } catch (InterruptedException e) {
+        }
+        if (drawn == null) {
+            return;
+        }
         Card toDiscard = discard();
         addCard(drawn);
         discardDeck.addCard(toDiscard);
 
         writeToFile(
                 "player " + number + " draws a " + drawn.getValue() + " from deck " + drawDeck.getNumber() +
-                        "\n player " + number + " discards a " + toDiscard.getValue() + " to deck " + discardDeck.getNumber() +
-                        "\n player " + number + " current hand " + getHand());
+                        "\nplayer " + number + " discards a " + toDiscard.getValue() + " to deck "
+                        + discardDeck.getNumber() +
+                        "\nplayer " + number + " current hand " + getHand() + "\n",
+                true);
+        drawDeck.printDeckToFile();
+        discardDeck.printDeckToFile();
     }
 
-    private void writeToFile(String textToWrite) {
-        try (FileWriter file = new FileWriter(getName() + "_output.txt");) {
+    private void writeToFile(String textToWrite, boolean append) {
+        try (FileWriter file = new FileWriter(getName() + "_output.txt", append);) {
             file.write(textToWrite);
         } catch (IOException e) {
             System.out.println("fail");
