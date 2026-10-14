@@ -13,7 +13,7 @@ public class TestCardDeck {
     private CardDeck[] createDecks(int n) {
         CardDeck[] decks = new CardDeck[n];
         for (int i = 0; i < n; i++) {
-            decks[i] = new CardDeck(i + 1);
+            decks[i] = new CardDeck(i + 1, n);
         }
         return decks;
 
@@ -56,7 +56,7 @@ public class TestCardDeck {
     @Test
     public void testCardDrawOrder() {
         int[] numbers = new int[] { 10, 3, 7, 1 };
-        CardDeck deck = new CardDeck(1);
+        CardDeck deck = new CardDeck(1, 1);
         for (int i = 0; i < 4; i++) {
             deck.addCard(new Card(numbers[i]));
         }
@@ -70,7 +70,7 @@ public class TestCardDeck {
     public void testPrintDeckToFile() {
         String data = "";
         int[] numbers = new int[] { 10, 3, 7, 1 };
-        CardDeck deck = new CardDeck(1);
+        CardDeck deck = new CardDeck(1, 1);
         for (int i = 0; i < 4; i++) {
             deck.addCard(new Card(numbers[i]));
         }
