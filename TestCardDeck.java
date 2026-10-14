@@ -1,3 +1,7 @@
+import java.io.File;
+import java.util.Scanner;
+import java.io.FileNotFoundException;
+
 import org.junit.BeforeClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +29,7 @@ public class TestCardDeck {
     }
 
     @Test
-    public void TestNumberAssignment() {
+    public void testNumberAssignment() {
         CardDeck[] decks = createDecks(10);
         for (int i = 0; i < 10; i++) {
             assertEquals("Deck numbers incorrectly assigned",
@@ -35,7 +39,7 @@ public class TestCardDeck {
     }
 
     @Test
-    public void TestCardAdding() {
+    public void testCardAdding() {
         for (int n = 2; n < 50; n++) {
             CardDeck[] decks = createDecks(n);
             dealCards(decks);
@@ -50,7 +54,7 @@ public class TestCardDeck {
     }
 
     @Test
-    public void TestCardDrawOrder() {
+    public void testCardDrawOrder() {
         int[] numbers = new int[] { 10, 3, 7, 1 };
         CardDeck deck = new CardDeck(1);
         for (int i = 0; i < 4; i++) {
@@ -60,6 +64,29 @@ public class TestCardDeck {
             int c = deck.drawCard().getValue();
             assertEquals("Card value does not match draw order", c, numbers[i]);
         }
+    }
+
+    @Test
+    public void testPrintDeckToFile() {
+        String data = "";
+        int[] numbers = new int[] { 10, 3, 7, 1 };
+        CardDeck deck = new CardDeck(1);
+        for (int i = 0; i < 4; i++) {
+            deck.addCard(new Card(numbers[i]));
+        }
+        deck.printDeckToFile();
+        File f = new File("deck1_output.txt");
+
+        try (Scanner reader = new Scanner(f)) {
+            while (reader.hasNextLine()) {
+                data = reader.nextLine();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        assertEquals("output file does not match", "deck1 contents 10 3 7 1", data);
+
     }
 
 }
