@@ -2,8 +2,6 @@ import java.io.File;
 import java.util.Scanner;
 import java.io.IOException;
 
-import org.junit.BeforeClass;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -18,8 +16,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TestPlayer {
     AtomicInteger i = new AtomicInteger(-1);
 
+    @AfterClass
+    public static void removeFiles(){
+        File f = new File("Output/player1_output.txt"); 
+        f.delete();
+        f = new File("Output/player2_output.txt"); 
+        f.delete();
+        f = new File("Output/deck1_output.txt"); 
+        f.delete();
+        f = new File("Output/deck2_output.txt"); 
+        f.delete();
+    }
+
     @Test 
-    public void TestAtomicDrawDiscard(){
+    public void testAtomicDrawDiscard(){
         String data = "";
         CardDeck deck1 = new CardDeck(1, 2);
         CardDeck deck2 = new CardDeck(2, 2);
@@ -54,7 +64,7 @@ public class TestPlayer {
     }
 
     @Test 
-    public void TestWaitNotify(){
+    public void testWaitNotify(){
         String data = "";
         CardDeck emptyDeck = new CardDeck(1, 2);
         CardDeck deck2 = new CardDeck(2, 2);
