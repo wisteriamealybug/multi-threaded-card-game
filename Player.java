@@ -2,7 +2,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Player extends Thread {
@@ -11,17 +10,15 @@ public class Player extends Thread {
     private int wanted;
     private CardDeck drawDeck;
     private CardDeck discardDeck;
-    private volatile AtomicBoolean hasPlayerWon;
     private volatile AtomicInteger winningPlayer;
     private CyclicBarrier latch;
 
-    public Player(int number, CardDeck drawDeck, CardDeck discardDeck, AtomicBoolean flag,
+    public Player(int number, CardDeck drawDeck, CardDeck discardDeck,
             AtomicInteger winningPlayer, CyclicBarrier latch) {
         hand = new Card[4];
         wanted = 0;
         this.number = number;
         setName("player" + number);
-        this.hasPlayerWon = flag;
         this.winningPlayer = winningPlayer;
         this.drawDeck = drawDeck;
         this.discardDeck = discardDeck;
@@ -35,7 +32,6 @@ public class Player extends Thread {
 
         if (hasWon()) {
             winningPlayer.set(number);
-            hasPlayerWon.set(true);
             finalText += "player " + number + " wins\n";
         }
         try {
@@ -44,11 +40,10 @@ public class Player extends Thread {
         } catch (BrokenBarrierException e) {
         }
 
-        while (!hasPlayerWon.get()) {
+        while (winningPlayer.get() == -1) {
             atomicDrawDiscard();
             if (hasWon()) {
                 winningPlayer.set(number);
-                hasPlayerWon.set(true);
                 finalText += "player " + number + " wins\n";
                 discardDeck.notifyHasWon();
             }

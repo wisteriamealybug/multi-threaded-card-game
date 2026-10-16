@@ -3,7 +3,6 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CardGame {
@@ -17,8 +16,7 @@ public class CardGame {
 
         String filename = "";
 
-        AtomicBoolean flag = new AtomicBoolean(false);
-        AtomicInteger winner = new AtomicInteger(0);
+        AtomicInteger winner = new AtomicInteger(-1);
 
         Scanner s = new Scanner(System.in);
 
@@ -63,7 +61,7 @@ public class CardGame {
             decks[i] = new CardDeck(i + 1, playerNumber);
         }
         for (int i = 0; i < playerNumber; i++) {
-            players[i] = new Player(i + 1, decks[i], decks[(i + 1) % playerNumber], flag, winner, latch);
+            players[i] = new Player(i + 1, decks[i], decks[(i + 1) % playerNumber], winner, latch);
         }
 
         // deals cards to each player in a round robin fashion
@@ -110,4 +108,6 @@ public class CardGame {
         }
         return pack;
     }
+
+
 }
