@@ -70,12 +70,12 @@ public class CardGame {
 
         game.deal(pack);
         game.runGame();
-        
+
         System.out.println("player " + game.getWinner() + " wins!");
     }
 
     public Card[] readPack(int playerNumber, String filename)
-            throws FileNotFoundException, IllegalStateException, ArrayIndexOutOfBoundsException {
+        throws FileNotFoundException, IllegalStateException, ArrayIndexOutOfBoundsException {
         Card[] pack = new Card[8 * playerNumber];
         int count = 0;
         File f = new File(filename);
@@ -124,5 +124,13 @@ public class CardGame {
             latch.await();
             players[0].join();
         } catch (InterruptedException e) {} catch (BrokenBarrierException e) {}
+    }
+
+    public Player[] getPlayers(){
+        return players;
+    }
+
+    public CardDeck[] getDecks(){
+        return decks;
     }
 }
