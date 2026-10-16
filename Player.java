@@ -97,7 +97,7 @@ public class Player extends Thread {
     }
 
     private void writeToFile(String textToWrite, boolean append) {
-        try (FileWriter file = new FileWriter(getName() + "_output.txt", append);) {
+        try (FileWriter file = new FileWriter("Output/" + getName() + "_output.txt", append);) {
             file.write(textToWrite);
         } catch (IOException e) {
             System.out.println("fail");

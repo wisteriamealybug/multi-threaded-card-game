@@ -75,7 +75,7 @@ public class TestCardDeck {
             deck.addCard(new Card(numbers[i]));
         }
         deck.printDeckToFile();
-        File f = new File("deck1_output.txt");
+        File f = new File("Output/deck1_output.txt");
 
         try (Scanner reader = new Scanner(f)) {
             while (reader.hasNextLine()) {

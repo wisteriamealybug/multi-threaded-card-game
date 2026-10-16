@@ -54,7 +54,7 @@ public class CardDeck {
     }
 
     public void printDeckToFile() {
-        try (FileWriter file = new FileWriter("deck" + number + "_output.txt")) {
+        try (FileWriter file = new FileWriter("Output/deck" + number + "_output.txt")) {
             String toWrite = "deck" + number + " contents ";
             for (int i = 0; i < deck.length; i++) {
                 if (deck[i] != null) {

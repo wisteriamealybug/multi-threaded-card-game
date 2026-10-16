@@ -11,42 +11,30 @@ import static org.junit.Assert.*;
 
 import java.io.FileNotFoundException;
 import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestPlayer {
-    AtomicBoolean a = new AtomicBoolean(false);
     AtomicInteger i = new AtomicInteger(-1);
-
-    String data;
-
-    CardDeck deck1;
-    CardDeck deck2;
-
-    @Before
-    public void setUp(){
-        deck1 = new CardDeck(1);
-        deck2 = new CardDeck(2);
-        for (int i = 0; i < 4; i++){
-            deck1.addCard(new Card(deck1.getNumber()));
-            deck2.addCard(new Card(deck2.getNumber()));
-        }
-    }
-    @After
-    public void tearDown(){
-        deck1 = null;
-        deck2 = null;
-    }
 
     @Test 
     public void TestAtomicDrawDiscard(){
-        Player p = new Player(1, deck1, deck2, a, i);
+        String data = "";
+        CardDeck deck1 = new CardDeck(1, 2);
+        CardDeck deck2 = new CardDeck(2, 2);
+        for (int i = 0; i < 4; i++){
+            deck1.addCard(new Card(1));
+            deck2.addCard(new Card(2));
+        }
+        CyclicBarrier latch = new CyclicBarrier(1);
+        Player p = new Player(1, deck1, deck2, i, latch);
         for (int i = 0; i < 5; i++){
             p.addCard(new Card(0));
         }
         for (int j = 1; j < 5; j++){
             p.atomicDrawDiscard();
-            File f = new File("player1_output.txt");
+            File f = new File("Output/player1_output.txt");
             try (Scanner reader = new Scanner(f)){
                 while (reader.hasNextLine()){
                     data = reader.nextLine();
@@ -67,10 +55,15 @@ public class TestPlayer {
 
     @Test 
     public void TestWaitNotify(){
-
-        CardDeck emptyDeck = new CardDeck(1);
-        Player p1 = new Player(1, emptyDeck, deck2, a, i);
-        Player p2 = new Player(2, deck2, emptyDeck, a, i);
+        String data = "";
+        CardDeck emptyDeck = new CardDeck(1, 2);
+        CardDeck deck2 = new CardDeck(2, 2);
+        for (int i = 0; i< 4; i++){
+            deck2.addCard(new Card(2));
+        }
+        final CyclicBarrier latch = new CyclicBarrier(1);
+        Player p1 = new Player(1, emptyDeck, deck2, i, latch);
+        Player p2 = new Player(2, deck2, emptyDeck, i, latch);
         for (int i = 0; i < 4; i++){
             p1.addCard(new Card(0));
             p2.addCard(new Card(3));
@@ -93,7 +86,7 @@ public class TestPlayer {
             t1.join();
         } catch (InterruptedException e){}
 
-        File f = new File("player1_output.txt");
+        File f = new File("Output/player1_output.txt");
         try (Scanner reader = new Scanner(f)){
             while (reader.hasNextLine()){
                 data = reader.nextLine();
