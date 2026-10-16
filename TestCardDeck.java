@@ -45,9 +45,11 @@ public class TestCardDeck {
             dealCards(decks);
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < 4; j++)
-                    assertEquals(
+                    try{
+                        assertEquals(
                             "Card in deck " + i + " at position " + j + " either does not exist or is incorrectly set",
                             decks[i].drawCard().getValue(), 0);
+                    } catch (InterruptedException e){}
             }
         }
 
@@ -55,13 +57,16 @@ public class TestCardDeck {
 
     @Test
     public void testCardDrawOrder() {
+        int c = -1;
         int[] numbers = new int[] { 10, 3, 7, 1 };
         CardDeck deck = new CardDeck(1, 1);
         for (int i = 0; i < 4; i++) {
             deck.addCard(new Card(numbers[i]));
         }
         for (int i = 0; i < 4; i++) {
-            int c = deck.drawCard().getValue();
+            try{
+                c = deck.drawCard().getValue();
+            } catch (InterruptedException e){}
             assertEquals("Card value does not match draw order", c, numbers[i]);
         }
     }
