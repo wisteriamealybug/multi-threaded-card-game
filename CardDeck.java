@@ -41,7 +41,6 @@ public class CardDeck {
         Card c = deck[top++];
         deck[top - 1] = null; // Removes element to help with printing top = top % deck.length;
         top = top % deck.length;
-        notify();
         return c;
     }
 
@@ -64,6 +63,14 @@ public class CardDeck {
             file.write(toWrite.strip());
         } catch (IOException e) {
             System.out.println("fail");
+        }
+    }
+
+    public void await() {
+        try {
+            wait();
+        } catch (InterruptedException e) {
+
         }
     }
 }
