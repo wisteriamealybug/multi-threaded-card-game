@@ -73,18 +73,19 @@ public class Player extends Thread {
 
     public synchronized void atomicDrawDiscard() {
         Card drawn = null;
+        Card toDiscard = null;
         // Player is interrupted if another player wins while it waits for an empty deck
         // It then returns, failing the atomic action entirely.
-        try {
+        synchronized (discardDeck) {synchronized (drawDeck) {try {
             drawn = drawDeck.drawCard();
         } catch (InterruptedException e) {
         }
         if (drawn == null) {
             return;
         }
-        Card toDiscard = discard();
+        toDiscard = discard();
         addCard(drawn);
-        discardDeck.addCard(toDiscard);
+        discardDeck.addCard(toDiscard);}}
 
         writeToFile(
                 "player " + number + " draws a " + drawn.getValue() + " from deck " + drawDeck.getNumber() +
