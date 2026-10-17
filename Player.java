@@ -119,8 +119,9 @@ public class Player extends Thread {
         return c;
     }
 
-    public Boolean hasWon() {
-        return wanted == 4;
+    public boolean hasWon() {
+        return hand[0].getValue() == hand[1].getValue() && hand[1].getValue() == hand[2].getValue()
+                && hand[2].getValue() == hand[3].getValue();
     }
 
     private String getHand() {
