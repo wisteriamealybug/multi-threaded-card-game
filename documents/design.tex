@@ -14,20 +14,19 @@ Card also contains a getValue method that returns the value of the card.
 
 \subsection{CardDeck}
 CardDeck takes two values for the constructor, one for the number that represents the deck and one for the number of players in the game.
-The constructor then creates a Card list with a size of 4\*n +1, with n representing the number of players and then sets two variables top and tail to zero.
-The size of the list is made so that the deck cannot be full; as the players will always hold 4 cards, a single deck can only hold 4n cards at most. 
+The constructor then creates a Card list with a size of 4\*n +1, with n representing the number of players and then sets two variables top and tail to zero. The size of the list is made so that the deck cannot be full; as the players will always hold 4 cards, a single deck can only hold 4n cards at most. 
 An alternative to this would be to prevent players from discarding to a full deck, pausing the Player threads so that they cannot discard, but this approach could cause issues with locking threads, potentially leading to a scenario where the game is completely paused due to deadlock.
 Having the size larger than necessary prevents any need for pausing threads. \\
 CardDeck is implemented as a circular queue, with the variable top pointing to the start of the queue and tail pointing to the next empty space. We decided that a circular queue was best as it implements FIFO structure simply, and the max size of the deck is known. \\
-The method addCard will take in a new Card and place it in the space tail points at, before incrementing tail, wrapping back around to 0 if the value exceeds the length of the array. \\ 
-CardDeck also has the method drawCard for taking a card out, which returns the Card that top is pointing at, before incrementing top.
+The method addCard() will take in a new Card and place it in the space tail points at, before incrementing tail, wrapping back around to 0 if the value exceeds the length of the array. \\ 
+CardDeck also has the method drawCard() for taking a card out, which returns the Card that top is pointing at, before incrementing top.
 If the queue is empty, then the CardDeck will call for the thread to wait, preventing the Player that draws from the CardDeck from trying to take a null value for Card.
-The addCard method will notify the waiting thread so that when a Card is added, the waiting Player can draw a Card and resume the thread. \\
-// notifyHasWon notifies a waiting thread that a player has won - stops action\\
+The addCard() method will notify the waiting thread so that when a Card is added, the waiting Player can draw a Card and resume the thread. \\
+The notifyHasWon() method simply calls notify(), this method is called by Player.run() when by a winning Player, or by a Player when notified another has won. We call this method the Player's discard deck, waking any threads waiting for a card to be added to that deck. Then, the drawCard() method will return null, failing the player's atomic action entirely. We decided to wake Players as it ensures any waiting Player is notified in a simple manner.
 CardDeck finally has a method printDeckToFile which will output the contents of the Card array to a new text file.\\
 
 \subsection{Player}
-Player is a class that inherits from the Thread class built into Java. We chose to inherit from Thread, as opposed to implementing Runnable since\\
+Player is a class that inherits from the Thread class built into Java. We chose to inherit from Thread, as opposed to implementing Runnable since we did not need to implement any multi-inheritance\\
 The constructor for Player takes a number for the value of the Player, two CardDecks, one for drawing from and one for discarding to, an AtomicInteger that represents the number of the Player who wins the game, and a CyclicBarrier that prevents the thread from running until the game begins. The barrier stops the thread from starting until all threads have been created, preventing a Player from taking turns before all other threads have checked their initial hand. The Player constructor then creates a Card array of size 4, since the Player will only ever hold 4 cards due to the draw and discard needing to be one action. An integer value 'wanted' is also created to keep track of the number of cards Player has that it keeps hold of. (Cards that have a value equal to the number Player has been assigned)\\
 The addCard method for Player takes in a Card value and adds it to any empty space in the Player hand. If the Card input is the same value as the Player number then the variable wanted is incremented.\\
 The private discard method will generate a random integer with a maximum value of the number of unwanted cards, (Cards that don't have the same value as the Player number) then go through the array and subtract from the value until 0 and return the Card at that position.This prevents the Player from discarding a wanted Card, while still randomly choosing a Card to discard. This could've been implemented by generating a random number between 0 and 3 and taking the Card at this index, then discarding it if the Card is unwanted or choosing a new random number. However, this approach could lead to the same number being generated several times before a Card is chosen, for example when there is only one unwanted Card, it is unlikely the random number will land on that Card.\\
@@ -39,7 +38,12 @@ This method is thread safe as two Players will never be able to see the same Car
 After the method has finished drawing and discarding, the Player will write the action to a text file, appending to the current one.\\
 
 \subsection{CardGame}
-...
+The CardGame class is responsible for getting user input, setting up the game, and starting the threads. It takes user input in the main() method. The constructor takes only the number of required players for the game. It then creates an AtomicInteger, used as a flag to notify players when another has one, and a CyclicBarrier descibed in 1.3. It also creates new Players and CardDecks. This basic setup is required for every game, so we decided to put it in the constructor, forcing it to be called when CardGame is created.\\
+The readPack() method reads a pack specified in the argument, and check if it is valid.  If it is, it returns an array of cards, otherwise it throws an exception. Throwing an exception allows us to handle output messages to the user in the main() method.\\
+The deal() method takes the pack, an array of cards, as an argument. It then deals the cards to the Players and then to the CardDecks in the round robin fashion specified. This is a simple method, which we decided to seperate from the reading of the pack. This ensures that the code is cleaner, as readPack() is likely to be called many times if the user gives an invalid pack.\\
+The runGame() method starts every player thread. We then call CyclicBarrier.await() on the main thread. This starts every thread at the same time. We want this functionality to allow every player to check if their initial hand before players start drawing/discarding. It then calls join() on player 1. This stops the main thread from continuing execution until player 1 has finished, we want this to occur so we can output the winning player from main().\\
+Finally, the main() method is responsible for getting user input. We check that each user input is valid, and then read in a pack. We handle the errors thrown by readPack() by outputting a message to the user, and asking for a new valid pack. We then run the game.
+
 \section{Testing}
 We designed our test suite using JUnit 4.13.2. We opted for JUnit4 over 5 or 6, as this version is focused on by the module. Further, we decided the extra features from later versions would not be needed to test the card game.
 \subsection{Unit tests}
