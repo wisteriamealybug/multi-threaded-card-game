@@ -12,13 +12,12 @@ public class CardGame {
     private CyclicBarrier latch;
     private AtomicInteger winner;
 
-
-    public CardGame(int playerNumber){
+    public CardGame(int playerNumber) {
         this.playerNumber = playerNumber;
         decks = new CardDeck[playerNumber];
         players = new Player[playerNumber];
         latch = new CyclicBarrier(playerNumber + 1);
-        winner = new AtomicInteger(-1);
+        winner = new AtomicInteger(-1); // used as a flag to alert players that there is a winner
 
         // creates all players and decks in the game
         for (int i = 0; i < playerNumber; i++) {
@@ -28,10 +27,13 @@ public class CardGame {
             players[i] = new Player(i + 1, decks[i], decks[(i + 1) % playerNumber], winner, latch);
         }
     }
+
     public static void main(String args[]) {
         // initialises variables
         int tempPlayerNumber = 0;
         String filename = "";
+
+        new File("Output").mkdir(); // creates the Output folder if it does not exist
 
         Scanner s = new Scanner(System.in);
 
@@ -56,7 +58,8 @@ public class CardGame {
             System.out.print("Please enter filename of pack to load: ");
             filename = s.nextLine();
             try {
-                pack = game.readPack(game.getPlayerNumber(), filename); // creates an array of cards for the integers in pack
+                pack = game.readPack(game.getPlayerNumber(), filename); // creates an array of cards for the integers in
+                                                                        // pack
                 run = false;
             } catch (FileNotFoundException e) {
                 System.out.println("File does not exist");
@@ -75,7 +78,7 @@ public class CardGame {
     }
 
     public Card[] readPack(int playerNumber, String filename)
-        throws FileNotFoundException, IllegalStateException, ArrayIndexOutOfBoundsException {
+            throws FileNotFoundException, IllegalStateException, ArrayIndexOutOfBoundsException {
         Card[] pack = new Card[8 * playerNumber];
         int count = 0;
         File f = new File(filename);
@@ -92,15 +95,15 @@ public class CardGame {
         return pack;
     }
 
-    public int getWinner(){
+    public int getWinner() {
         return winner.get();
     }
 
-    public int getPlayerNumber(){
+    public int getPlayerNumber() {
         return playerNumber;
     }
 
-    public void deal(Card[] pack){
+    public void deal(Card[] pack) {
         // deals cards to each player in a round robin fashion
         int nextInPack = 0;
         for (int i = 0; i < 4; i++) {
@@ -116,21 +119,24 @@ public class CardGame {
         }
     }
 
-    public void runGame(){
+    public void runGame() {
         for (int i = 0; i < playerNumber; i++) {
             players[i].start();
         }
         try {
-            latch.await();
-            players[0].join();
-        } catch (InterruptedException e) {} catch (BrokenBarrierException e) {}
+            latch.await(); // this is the final latch.await() needed to begin, starting all players once
+                           // main reaches this point
+            players[0].join(); // we wait until player 1 has finished as player 1 will always be in the game
+        } catch (InterruptedException e) {
+        } catch (BrokenBarrierException e) {
+        }
     }
 
-    public Player[] getPlayers(){
+    public Player[] getPlayers() {
         return players;
     }
 
-    public CardDeck[] getDecks(){
+    public CardDeck[] getDecks() {
         return decks;
     }
 }
