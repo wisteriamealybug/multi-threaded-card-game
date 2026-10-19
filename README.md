@@ -1,5 +1,5 @@
 # Version
-This uses JUnit4, and has been tested on JDK versions 25 and 27.
+This uses JUnit4, and has been tested on JDK version 27.
 ## Tests
 
 The test for this module use junit-4.13.2 and requires hamcrest-core-1.3 to be run correctly.  If you have these installed, you can replace the path to junit-4.13.2 and hamcrest-core-1.3 with the path to your own files.  This should not be required, as junit-4.13.2.jar and hamcrest-core-1.3.jar are both included in this zip.
