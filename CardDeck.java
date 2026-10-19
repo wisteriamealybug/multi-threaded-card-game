@@ -8,9 +8,9 @@ public class CardDeck {
     private int tail;
 
     public CardDeck(int number, int playerNumber) {
-        // The size is set to 13 to allow for the case where one player
-        // discards all from its hand and the previous deck to the following deck
-        // 13 allows for 12 cards to be in the deck at one time
+        // The size is set to 4 * the number of players + 1
+        // This ensures that the deck will never be full
+        // Since every player will always have 4 cards in their hand
         deck = new Card[4 * playerNumber + 1];
         this.number = number;
         top = 0;
@@ -32,10 +32,12 @@ public class CardDeck {
             try {
                 wait();
                 if (top == tail) {
-                    return null;
+                    return null; // we return null to show the player that the deck is still empty after they
+                                 // have been notified
                 }
             } catch (InterruptedException e) {
-                throw e;
+                throw e; // if the thread is interrupted while waiting, the atomic action fails in its
+                         // entirety
             }
         }
         Card c = deck[top++];
@@ -62,7 +64,7 @@ public class CardDeck {
             }
             file.write(toWrite.strip());
         } catch (IOException e) {
-            System.out.println("fail");
+            System.out.println("Failed to write to Output/deck" + number + "_output.txt");
         }
     }
 

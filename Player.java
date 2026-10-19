@@ -35,6 +35,8 @@ public class Player extends Thread {
             finalText += "player " + number + " wins\n";
         }
         try {
+            // We call latch.await() here to force players to wait until every player has
+            // checked their initial hand
             latch.await();
         } catch (InterruptedException e) {
         } catch (BrokenBarrierException e) {
@@ -54,7 +56,7 @@ public class Player extends Thread {
                     + " has won\n";
             discardDeck.notifyHasWon();
         }
-        finalText += "player " + number + " exits\n" + "player " + number + " final hand " + getHand();
+        finalText += "player " + number + " exits\n" + "player " + number + " final hand " + getHand(); // common final text to both winners and losers
         writeToFile(finalText, true);
         drawDeck.printDeckToFile();
     }
@@ -63,7 +65,7 @@ public class Player extends Thread {
         for (int i = 0; i < 4; i++) {
             if (hand[i] == null) {
                 if (card.getValue() == number) {
-                    wanted++;
+                    wanted++; // increments wanted for use in discard()
                 }
                 hand[i] = card;
                 return;
@@ -93,15 +95,14 @@ public class Player extends Thread {
                         + discardDeck.getNumber() +
                         "\nplayer " + number + " current hand " + getHand() + "\n",
                 true);
-        drawDeck.printDeckToFile();
-        discardDeck.printDeckToFile();
     }
 
     private void writeToFile(String textToWrite, boolean append) {
         try (FileWriter file = new FileWriter("Output/" + getName() + "_output.txt", append);) {
             file.write(textToWrite);
         } catch (IOException e) {
-            System.out.println("fail");
+            System.out.println("Failed to write to Output/" + getName() + "_output.txt");
+            e.printStackTrace();
         }
     }
 
@@ -110,6 +111,7 @@ public class Player extends Thread {
         int randomUnwanted = (int) Math.floor(Math.random() * (4 - wanted));
         for (int i = 0; i < 4; i++) {
             if (hand[i].getValue() != number) {
+                // we decrement randomUnwanted until it reaches 0 to ensure players discard only unwanted cards randomly
                 if (randomUnwanted-- == 0) {
                     c = hand[i];
                     hand[i] = null;
@@ -126,6 +128,7 @@ public class Player extends Thread {
     }
 
     private String getHand() {
+        // returns hand in a human readable format
         String hand = "";
         for (int i = 0; i < 4; i++) {
             hand += this.hand[i].getValue() + " ";
