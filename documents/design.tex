@@ -2,8 +2,8 @@
 \usepackage[a4paper, margin=2cm]{geometry}
 \title{Design of a multi-threaded card game}
 \date{}
-
 \begin{document}
+
 \maketitle
 
 We decided to split our code into 4 main classes: Card, CardDeck, Player, and CardGame. This division makes the most sense, as they are all the objects if the game were played in reality. CardGame is responsible for setting up the game, and starting threads. It also is the class that will be run by the user,
@@ -65,64 +65,53 @@ Another limitation is due to the requirement of the draw-discard action to be at
 We also note that the tests have only been run on Linux, so other operating systems have have unknown errors.
 \newpage
 \section{Development process report}
-\subsection{Session 1}
+Session 1\\
 Start: 14:30 07-10-2026
 Duration: 1h 30mins
-Roles:  Oliver: Driver - My: Navigator 
-Commits:
-\begin{enumerate}
-    \item "Added Card Class", Created constructor and get value method for Card
-    \item "Added CardDeck class", Created constructor and circular queue implementation
-    \item "Added Player class + fixed access modifiers", Created Player and added basic draw/discard functionality
-    \item "Added writing to files", Intial file writing for Player and CardDeck
-\end{enumerate}
-\subsection{Session 2}
+Roles:  Oliver: Driver - My: Navigator \\
+Commits:\\
+"Added Card Class", Created constructor and get value method for Card\\
+"Added CardDeck class", Created constructor and circular queue implementation\\
+"Added Player class + fixed access modifiers", Created Player and added basic draw/discard functionality\\
+"Added writing to files", Intial file writing for Player and CardDeck\\\\
+Session 2\\
 Start: 16:00 12-10-2026
 Duration: 2h 20mins
-Roles:  Oliver: Navigator - My: Driver
-Commits:
-\begin{enumerate}
-    \item "Added atomicDrawDiscard to player, and created helper methods", Refactored writing into own method, made discard() private, and created intial atomicDrawDiscard()
-    \item "Updated run methods in Player to add flags, actions and write methods", Added run() method to Player for action and win checks
-    \item "Initial tests for card deck functionality", Tests for FIFO functionality, and ability to add cards
-\end{enumerate}
-\subsection{Session 3}
+Roles:  Oliver: Navigator - My: Driver\\
+Commits:\\
+"Added atomicDrawDiscard to player, and created helper methods", Refactored writing into own method, made discard() private, and created intial atomicDrawDiscard()\\
+"Updated run methods in Player to add flags, actions and write methods", Added run() method to Player for action and win checks\\
+"Initial tests for card deck functionality", Tests for FIFO functionality, and ability to add cards\\\\
+Session 3\\
 Start: 14:15 13-10-2026
 Duration: 2h 45mins
-Roles:  Oliver: Driver - My: Navigator 
-Commits:
-\begin{enumerate}
-    \item "Added wait and notify to prevent drawing from empty decks", Synchronised addCard, drawCard and added wait-notify functionality for threads
-    \item "Added tests for the player class", Test that atomicDrawDiscard draws and discards a card, test that wait-notify works correctly.
-    \item "Created CardGame class and added game setup", Taking user input, pack file reading, and dealing pack cards to players and decks.
-\end{enumerate}
-\subsection{Session 4}
+Roles:  Oliver: Driver - My: Navigator \\
+Commits:\\
+    "Added wait and notify to prevent drawing from empty decks", Synchronised addCard, drawCard and added wait-notify functionality for threads\\
+    "Added tests for the player class", Test that atomicDrawDiscard draws and discards a card, test that wait-notify works correctly.\\
+    "Created CardGame class and added game setup", Taking user input, pack file reading, and dealing pack cards to players and decks.\\\\
+Session 4\\
 Start: 14:45 14-10-2026
 Duration: 2h 15mins
-Roles:  Oliver: Navigator - My: Driver
-Commits:
-\begin{enumerate}
-    \item "Added additional test for file printing and tests for Card", Test for CardDeck printing, and tests for Card
-    \item "Updated CardGame, Player, and CardDeck with CLI and thread running", Added interruption for Threads waiting when a player wins. Improved user input with error messages.  Added CyclicBarrier to start threads simultaneously
-    \item "Updated TestCardDeck for additional playerNumber constructor argument", Corrected an error in CardDeck tests from change to CardDeck constructor
-\end{enumerate}
-\subsection{Session 5}
+Roles:  Oliver: Navigator - My: Driver\\
+Commits:\\
+"Added additional test for file printing and tests for Card", Test for CardDeck printing, and tests for Card\\
+"Updated CardGame, Player, and CardDeck with CLI and thread running", Added interruption for Threads waiting when a player wins. Improved user input with error messages.  Added CyclicBarrier to start threads simultaneously\\
+"Updated TestCardDeck for additional playerNumber constructor argument", Corrected an error in CardDeck tests from change to CardDeck constructor\\\\
+Session 5\\
 Start: 17:45 16-10-2026
 Duration: 2h 25mins
-Roles:  Oliver: Driver - My: Navigator 
-Commits:
-\begin{enumerate}
-    \item "Fixed tests", Corrected errors in tests due to added functionality with latches and flags
-    \item "Refactored CardGame", Separated CardGame.main() into several public methods in CardGame to allow for easier testing of setup
-    \item "Added tests for card game", Tests include: Pack is read correctly, and invalid decks throw correct exceptions, cards are dealt correctly, testing differing pack win conditions when running game. Created test packs for tests to use
-\end{enumerate}
-\subsection{Session 6}
+Roles:  Oliver: Driver - My: Navigator \\
+Commits:\\
+"Fixed tests", Corrected errors in tests due to added functionality with latches and flags\\
+"Refactored CardGame", Separated CardGame.main() into several public methods in CardGame to allow for easier testing of setup\\
+"Added tests for card game", Tests include: Pack is read correctly, and invalid decks throw correct exceptions, cards are dealt correctly, testing differing pack win conditions when running game. Created test packs for tests to use\\\\
+Session 6\\
 Start: 20:00 17-10-2026
 Duration: 1h
-Roles:  Oliver: Navigator - My: Driver
-Commits:
-\begin{enumerate}
-    \item "Updated hasWon to fix functionality when player has 4 of same unwanted cards and added test". Added test for Player.hasWon(), and fixed an error in how Player.hasWon() handles 4 of the same unwanted cards.
-    \item "Removed redundant synchronized statements", General clean up of methods and redundancies
-\end{enumerate}
+Roles:  Oliver: Navigator - My: Driver\\
+Commits:\\
+"Updated hasWon to fix functionality when player has 4 of same unwanted cards and added test". Added test for Player.hasWon(), and fixed an error in how Player.hasWon() handles 4 of the same unwanted cards.\\
+"Removed redundant synchronized statements", General clean up of methods and redundancies
+
 \end{document}
