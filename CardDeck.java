@@ -46,10 +46,6 @@ public class CardDeck {
         return c;
     }
 
-    public Boolean isEmpty() {
-        return top == tail;
-    }
-
     public synchronized void notifyHasWon() {
         notify();
     }
@@ -68,11 +64,4 @@ public class CardDeck {
         }
     }
 
-    public void await() {
-        try {
-            wait();
-        } catch (InterruptedException e) {
-
-        }
-    }
 }
