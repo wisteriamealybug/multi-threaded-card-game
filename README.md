@@ -7,13 +7,13 @@ The test for this module use junit-4.13.2 and requires hamcrest-core-1.3 to be r
 As the bytecode is already located in this zip, compiling the tests should not be necessary. However, if the tests need to be recompiled please run the following command, on Linux or MacOS.
 
 ```
-javac -cp .:junit-4.13.2.jar:hamcrest-core-1.3.jar Test*.java
+javac -cp .:junit-4.13.2.jar:hamcrest-core-1.3.jar *.java
 ```
 
 And on Windows
 
 ```
-javac -cp .;junit-4.13.2.jar;hamcrest-core-1.3.jar Test*.java
+javac -cp .;junit-4.13.2.jar;hamcrest-core-1.3.jar *.java
 ```
 
 ## Running Tests
